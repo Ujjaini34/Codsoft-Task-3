@@ -1,0 +1,74 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# Load the dataset
+iris_df = pd.read_csv(r'C:\Users\Ujjaini\OneDrive\Desktop\CodSoft\IRIS.csv')
+
+# Plot the distribution of each feature
+iris_df.hist(figsize=(12, 8))
+plt.show()
+
+# Perform PCA to reduce dimensionality and visualize the data
+pca = PCA(n_components=2)
+pca_df = pca.fit_transform(iris_df.drop('species', axis=1))
+plt.scatter(pca_df[:, 0], pca_df[:, 1], c=pd.Categorical(iris_df['species']).codes)
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('PCA Visualization')
+plt.show()
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(iris_df.drop('species', axis=1), iris_df['species'], test_size=0.2, random_state=42)
+
+# Logistic Regression
+logreg = LogisticRegression(max_iter=1000)
+logreg.fit(X_train, y_train)
+y_pred_logreg = logreg.predict(X_test)
+print("Logistic Regression Accuracy:", accuracy_score(y_test, y_pred_logreg))
+print("Logistic Regression Classification Report:")
+print(classification_report(y_test, y_pred_logreg))
+print("Logistic Regression Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_logreg))
+
+# Decision Trees
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train, y_train)
+y_pred_dt = dt.predict(X_test)
+print("Decision Tree Accuracy:", accuracy_score(y_test, y_pred_dt))
+print("Decision Tree Classification Report:")
+print(classification_report(y_test, y_pred_dt))
+print("Decision Tree Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_dt))
+
+# SVM
+svm = SVC(random_state=42)
+svm.fit(X_train, y_train)
+y_pred_svm = svm.predict(X_test)
+print("SVM Accuracy:", accuracy_score(y_test, y_pred_svm))
+print("SVM Classification Report:")
+print(classification_report(y_test, y_pred_svm))
+print("SVM Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_svm))
+
+from sklearn.model_selection import GridSearchCV
+
+# Define the hyperparameter grid
+param_grid = {
+    'C': [0.1, 1, 10],
+    'kernel': ['linear', 'rbf', 'poly']
+}
+
+# Perform GridSearchCV
+grid_search = GridSearchCV(SVC(random_state=42), param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+
+# Print the best hyperparameters and the corresponding accuracy
+print("Best Hyperparameters:", grid_search.best_params_)
+print("Best Accuracy:", grid_search.best_score_)
